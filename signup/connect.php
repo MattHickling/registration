@@ -5,14 +5,10 @@ $USERNAME = "root";
 $PASSWORD = "root";
 $DB_NAME = "db_registration";
 
-
 $conn = mysqli_connect("$HOSTNAME", "$USERNAME", "$PASSWORD", "$DB_NAME"); 
 
-if($conn){
-    echo "connection successful";
-} else {
-    echo "not connected";
-};
+if(!$conn){
+    die(mysqli_error($conn));
+} 
 
-$mysqli_close($conn);
 ?>

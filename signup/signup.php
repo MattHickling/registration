@@ -1,6 +1,5 @@
 <?php
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     include "connect.php";
     echo "Connected";
 
@@ -9,17 +8,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     
     $sql = "SELECT * FROM users WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
-
-    if($result){
+    if ($result) {
         $num_rows = mysqli_num_rows($result);
-        if($num_rows > 0)
+        if ($num_rows > 0) {
             echo "This username already exists";
-    } else{
-        $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
-        echo "Signup successful";
-    };
-
-};
+        } else {
+            $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
+            if (mysqli_query($conn, $sql)) {
+                echo "Signup successful";
+            } else {
+                echo "Error: " . mysqli_error($conn);
+            }
+        }
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
 ?>
 
 <!doctype html>
@@ -32,19 +36,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
   </head>
   <body>
 
-    <div class="container">
+  <div class="container-fluid">
+        <h1 class="text-center">Signup here</h1>
         <form action="signup.php" method="post">
             <div class="mb-3">
                 <label class="form-label">Username</label>
-                <input type="text" class="form-control" name="username">
+                <input type="text" class="form-control" name="username" required>
             </div>
             <div class="mb-3">
                 <label class="form-label">Password</label>
-                <input type="text" class="form-control" name="password">
+                <input type="password" class="form-control" name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-outline-primary width-auto">Submit</button>
         </form>
-
     </div>
   </body>
 </html>
