@@ -1,21 +1,25 @@
 <?php
+
+$user = 0;
+$success = 0;
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     include "connect.php";
-    echo "Connected";
 
     $username = $_POST["username"];
     $password = $_POST["password"];
     
     $sql = "SELECT * FROM users WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
+
     if ($result) {
         $num_rows = mysqli_num_rows($result);
         if ($num_rows > 0) {
-            echo "This username already exists";
+            $user = 1;
         } else {
             $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
             if (mysqli_query($conn, $sql)) {
-                echo "Signup successful";
+                $success = 1;
             } else {
                 echo "Error: " . mysqli_error($conn);
             }
@@ -24,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Error: " . mysqli_error($conn);
     }
 }
+
 ?>
 
 <!doctype html>
@@ -36,7 +41,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   </head>
   <body>
 
-  <div class="container-fluid">
+<?php
+    if($user){
+        echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>On No!</strong> this user already exists.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>';
+        };
+
+    if($success){
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Great!</strong> your signup has been successful.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>';
+        };
+
+  ?>
+
+    <div class="container-fluid">
         <h1 class="text-center">Signup here</h1>
         <form action="signup.php" method="post">
             <div class="mb-3">
@@ -50,5 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit" class="btn btn-outline-primary width-auto">Submit</button>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>
