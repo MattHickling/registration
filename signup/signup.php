@@ -1,29 +1,25 @@
 <?php
-
 $user = 0;
 $success = 0;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     include "connect.php";
 
-    $user = 0;
-    $success = 0;
-
     $username = $_POST["username"];
-    $password = $_POST["password"];
-    
+    $password = trim($_POST["password"]);
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
+
     $sql = "SELECT * FROM users WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
         $num_rows = mysqli_num_rows($result);
         if ($num_rows > 0) {
-            $user = 1;
-            header('location:login.php');
+            $user = 1; 
         } else {
-            $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
-            if (mysqli_query($conn, $sql)) {
-                $success = 1;
+            $sql_insert = "INSERT INTO users (username, password) VALUES ('$username', '$hashed_password')";
+            if (mysqli_query($conn, $sql_insert)) {
+                $success = 1; 
             } else {
                 echo "Error: " . mysqli_error($conn);
             }
@@ -32,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Error: " . mysqli_error($conn);
     }
 }
-
 ?>
 
 <!doctype html>
