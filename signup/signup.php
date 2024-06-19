@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($num_rows > 0) {
             $user = 1; 
         } else {
-            $sql_insert = "INSERT INTO users (username, password, email) VALUES ('$username', '$hashed_password', $email)";
+            $sql_insert = "INSERT INTO users (username, password, email) VALUES ('$username', '$hashed_password', '$email')";
             if (mysqli_query($conn, $sql_insert)) {
                 $success = 1; 
             } else {

@@ -4,7 +4,9 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
-    email VARCHAR(255) NOT NULL
+    deleted_at TIMESTAMP NULL,
+    email VARCHAR(255) NOT NULL,
+    reset_token VARCHAR(64),
+    reset_token_expiry TIMESTAMP NULL
 );
 
