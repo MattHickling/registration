@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST["username"];
     $password = trim($_POST["password"]);
     $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
+    $email = $_POST["email"];
 
     $sql = "SELECT * FROM users WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
@@ -17,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($num_rows > 0) {
             $user = 1; 
         } else {
-            $sql_insert = "INSERT INTO users (username, password) VALUES ('$username', '$hashed_password')";
+            $sql_insert = "INSERT INTO users (username, password, email) VALUES ('$username', '$hashed_password', $email)";
             if (mysqli_query($conn, $sql_insert)) {
                 $success = 1; 
             } else {
@@ -63,6 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="mb-3">
                 <label class="form-label">Username</label>
                 <input type="text" class="form-control" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
             </div>
             <div class="mb-3">
                 <label class="form-label">Password</label>
