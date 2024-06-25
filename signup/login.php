@@ -4,26 +4,33 @@ $invalid = 0;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     include "connect.php";
-
+    
     $username = $_POST["username"];
     $password = $_POST["password"];
     
-    $sql = "SELECT * FROM users WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-
-    if ($result) {
-        $row = mysqli_fetch_assoc($result);
+    // Prepare and bind
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
             $login = 1;
             session_start();
             $_SESSION['username'] = $username;
             header('location:home.php');
+            exit();
         } else {
             $invalid = 1; 
         }
     } else {
         $invalid = 1;
     }
+    
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
@@ -37,18 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   </head>
   <body>
   <?php
-   
-    if($invalid){
-        echo '<div class="alert alert-error alert-dismissible fade show" role="alert">
-                <strong>Error</strong> Please check your credentials.
+    if ($invalid) {
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong> Please check your credentials.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-        };
+              </div>';
+    }
   ?>
-<div class="login">
-    <a href="signup.php" class="btn btn-succes">Signup</a>
-</div>    
-<div class="container-fluid">
+    <div class="login m-1 ms-3">
+        <a href="signup.php" class="btn btn-success">Signup</a>
+    </div>    
+    <div class="container-fluid">
         <h1 class="text-center">Login</h1>
         <form action="login.php" method="post">
             <div class="mb-3">
@@ -62,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
     </div>
-    <div class="login">
-        <a href="forget.php" class="btn btn-succes">Forgotten password</a>
+    <div class="login m-4">
+        <a href="forget.php" class="btn btn-success">Forgotten password</a>
     </div> 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>

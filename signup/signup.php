@@ -10,24 +10,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
     $email = $_POST["email"];
 
-    $sql = "SELECT * FROM users WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
+    // Prepare and execute the SELECT statement to check if the username already exists
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result) {
-        $num_rows = mysqli_num_rows($result);
+        $num_rows = $result->num_rows;
         if ($num_rows > 0) {
             $user = 1; 
         } else {
-            $sql_insert = "INSERT INTO users (username, password, email) VALUES ('$username', '$hashed_password', '$email')";
-            if (mysqli_query($conn, $sql_insert)) {
+            // Prepare and execute the INSERT statement to add a new user
+            $stmt_insert = $conn->prepare("INSERT INTO users (username, password, email) VALUES (?, ?, ?)");
+            $stmt_insert->bind_param("sss", $username, $hashed_password, $email);
+            if ($stmt_insert->execute()) {
                 $success = 1; 
             } else {
-                echo "Error: " . mysqli_error($conn);
+                echo "Error: " . $stmt_insert->error;
             }
+            $stmt_insert->close();
         }
     } else {
-        echo "Error: " . mysqli_error($conn);
+        echo "Error: " . $stmt->error;
     }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
@@ -42,21 +51,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <body>
 
 <?php
-    if($user){
+    if ($user) {
         echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>On No!</strong> this user already exists.
+                <strong>Oh No!</strong> This user already exists.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-        };
-    if($success){
+              </div>';
+    }
+    if ($success) {
         echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>Great!</strong> your signup has been successful.
+                <strong>Great!</strong> Your signup has been successful.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-        };
-  ?>
-<div class="login btn btn-outline-succes">
-    <a href="login.php" class="btn btn-outline-succes">Login</a>
+              </div>';
+    }
+?>
+<div class="login btn btn-success m-2">
+    <a href="login.php" class="btn btn-success">Login</a>
 </div>
     <div class="container-fluid">
         <h1 class="text-center">Signup</h1>
